@@ -1,0 +1,60 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+#define F_CPU 8000000UL
+#define TIMER1_DIVIDER 256
+#define CPU_FREQURENCY 8000000
+#define PWM_PORT PORTA
+#define PWM_PIN PORTA7
+
+#define PORT_X PORTC
+#define CLEAR_X 0b00001111
+#define PORT_Y PORTC
+#define CLEAR_Y 0b11110000
+#define PORT_Z PORTB
+#define CLEAR_Z 0b00001111
+#define PORT_E PORTB
+#define CLEAR_E 0b11110000
+
+
+#define PHASE_LENGTH 8
+#define BUFFER_LENGTH 64
+#define ERROR_BUFFER_OVERFOLLOW PSTR("Error: the commant buffer full!\n\r")
+#define WARNING_NOTHING_TO_DO PSTR("Warning: nothing to do!\n\r")
+#define WARNING_UNSUPPORTED_COMMAND PSTR("Warning: unsupported command!\n\r")
+#define SUCCESS_DONE PSTR("ok\n\r")
+#define ABSOLUTE_POSITIONING 0b01000000
+#define NEW_TASK 0b10000000
+#define STEPS_PER_X 5
+#define STEPS_PER_Y 5
+#define STEPS_PER_Z 5
+#define STEPS_PER_E 5
+#define MAX_ALLOWED_SPEED_X 5000
+#define MAX_ALLOWED_SPEED_Y 5000
+#define MAX_ALLOWED_SPEED_Z 1000
+#define MAX_ALLOWED_SPEED_E 1000
+#define INITIAL_F 1000
+#define INC_X  1
+#define DEC_X -1
+#define INC_Y  2
+#define DEC_Y -2
+#define INC_Z  3
+#define DEC_Z -3
+#define INC_E  4
+#define DEC_E -4
+struct vector
+{
+	float x;
+	float y;
+	float z;
+	float e;
+};
+
+struct discret_vector
+{
+	int x;
+	int y;
+	int z;
+	int e;
+};
+
+#endif

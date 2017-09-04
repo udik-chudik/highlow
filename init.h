@@ -1,0 +1,3 @@
+#define F_CPU 8000000UL
+
+void initDevice(void);
