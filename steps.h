@@ -3,7 +3,9 @@
 */
 #include <stdint.h>
 #include "config.h"
-static int kappa;
+//#include "global_variables.h"
+//#include "gcode.h"
 
-void moveOn(struct vector placment, float f);
+/*void moveOn(struct vector endpoint, float F);*/
+void moveOn(float F);
 void doStep(signed char motor);

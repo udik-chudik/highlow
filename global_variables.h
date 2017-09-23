@@ -4,8 +4,10 @@
 #include "config.h"
 #ifndef GLOBALVARIABLES_H
 #define GLOBALVARIABLES_H
-static struct vector location;
-static uint8_t state0 = 0;
+//static struct vector location = {0, 0, 0, 0};
+//static struct vector placement = {0, 0, 0, 0};
+
+
 /*
 	state0 - control byte
 	0b

@@ -8,6 +8,9 @@
 /*
 	Uart operations
 */
+
+
+
 void sendCharter(uint8_t charter){
 	/* Wait for empty transmit buffer */
 	while ( !( UCSRA & (1<<UDRE)) );
@@ -20,6 +23,28 @@ void sendStaicMessage(const char *string){
 		string++;
 	}
 }
+uint8_t checkCRC(uint8_t *input_buffer){
+
+	uint16_t CRC = 0;
+	int i = 0;
+
+	while (input_buffer[i] != '*'){
+		CRC = (CRC << 3) + (uint16_t) input_buffer[i];
+		CRC = (CRC << 3) + (uint16_t) input_buffer[i];
+		CRC = (CRC ^ (CRC >> 8));
+		//if (input_buffer[i] == 'R') PORTC |= (1<<PC0);
+		//sendCharter((uint8_t)CRC);
+		i++;
+	}
+	i++;
+	//sendCharter((uint8_t)CRC);
+	if (input_buffer[i] == (uint8_t)CRC){
+		return 1;
+	}else{
+		return 0;
+	}
+
+}
 ISR(USART_RXC_vect){
 	/*
 		When we got new charter from UART
@@ -27,9 +52,11 @@ ISR(USART_RXC_vect){
 	/*
 		Init static variables
 	*/
-	static uint8_t i = 0;
+	/*static uint8_t k = 0;*/
 	static uint8_t buffer[BUFFER_LENGTH];
+	static uint8_t bufferSwap[BUFFER_LENGTH];
 	static uint8_t was_comment = 0;
+	static int k = 0;
 	/*
 		Read charter
 	*/
@@ -41,27 +68,42 @@ ISR(USART_RXC_vect){
 		if (charter == ';'){
 			was_comment = 1;
 		}
-		if (i < BUFFER_LENGTH){
+		if (k < BUFFER_LENGTH){
 			if (!was_comment){
-				buffer[i] = charter;
-				i++;
+				buffer[k] = charter;
+				k++;
 			}
 		}else{
+			for (k = BUFFER_LENGTH - 1; k >= 0; k--){
+				bufferSwap[k]=buffer[k];
+				buffer[k] = 0;
+			}
+			k=0;
 			sendStaicMessage(ERROR_BUFFER_OVERFOLLOW);
 		}
 	}else{
+		buffer[k] = charter;
+		/*
+			Clear the buffer before analyzing
+		*/
+		for (k = BUFFER_LENGTH - 1; k >= 0; k--){
+			bufferSwap[k]=buffer[k];
+			buffer[k] = 0;
+		}
+		k=0;
 		/*
 			The command have been arrived.
 			Lets analyze it!
 		*/
-
-		AnalyzeCommand(buffer);
-		/*
-			Clear the buffer after analyzing
-		*/
-		for (i = BUFFER_LENGTH - 1; i > 0; i--){
-			buffer[i] = 0;
+		if (checkCRC(bufferSwap) || was_comment){ //Кастыль
+			AnalyzeCommand(bufferSwap);
+		}else{
+			sendStaicMessage(ERROR_CHECKSUM_FAILED);
 		}
+		was_comment = 0;
+
+
+
 	}
 
 }

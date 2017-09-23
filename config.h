@@ -1,7 +1,8 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 #define F_CPU 8000000UL
-#define TIMER1_DIVIDER 256
+#define OVERFLOWS_PER_SECOND_TIMER1 256 /*Сколько раз переполняется таймер 1 за одну секунду*/
+/*соответственно максимально возможная скорость -- это 3 м/мин достигается при F=6000*/
 #define CPU_FREQURENCY 8000000
 #define PWM_PORT PORTA
 #define PWM_PIN PORTA7
@@ -18,10 +19,12 @@
 
 #define PHASE_LENGTH 8
 #define BUFFER_LENGTH 64
-#define ERROR_BUFFER_OVERFOLLOW PSTR("Error: the commant buffer full!\n\r")
-#define WARNING_NOTHING_TO_DO PSTR("Warning: nothing to do!\n\r")
-#define WARNING_UNSUPPORTED_COMMAND PSTR("Warning: unsupported command!\n\r")
-#define SUCCESS_DONE PSTR("ok\n\r")
+#define ERROR_BUFFER_OVERFOLLOW PSTR("Error: the commant buffer full!\n")
+#define WARNING_NOTHING_TO_DO PSTR("Warning: nothing to do!\n")
+#define WARNING_UNSUPPORTED_COMMAND PSTR("Warning: unsupported command!\n")
+#define ERROR_CHECKSUM_FAILED PSTR("rs\n")
+#define SUCCESS_DONE PSTR("ok\n")
+#define WARNING_WAITING PSTR("_\n")
 #define ABSOLUTE_POSITIONING 0b01000000
 #define NEW_TASK 0b10000000
 #define STEPS_PER_X 5
@@ -51,10 +54,10 @@ struct vector
 
 struct discret_vector
 {
-	int x;
-	int y;
-	int z;
-	int e;
+	long x;
+	long y;
+	long z;
+	long e;
 };
 
 #endif

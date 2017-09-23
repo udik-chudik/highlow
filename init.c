@@ -1,6 +1,6 @@
 #include "init.h"
 #include <avr/io.h>
-#include "steps.h"
+//#include "steps.h"
 void initDevice(void){
 	/*
 	Configure ports
@@ -55,14 +55,14 @@ void initDevice(void){
 			WGM11 -> 1
 			WGM12 -> 1
 			WGM13 -> 1
-		Clock select: internal, OSC/256
-			CS10 -> 0
+		Clock select: internal, OSC/1
+			CS10 -> 1
 			CS11 -> 0
-			CS12 -> 1
+			CS12 -> 0
 
 	*/
 	TCCR1A = (1<<WGM11)|(1<<WGM10);
-	TCCR1B = (1<<WGM12)|(1<<WGM13)|(1<<CS12);
+	TCCR1B = (1<<WGM12)|(1<<WGM13)|(1<<CS10);
 
 	/*
 		Compare value:
@@ -86,12 +86,37 @@ void initDevice(void){
 		UBRR -> baud rate 9600
 	*/
 
-	UCSRB = (1<<RXEN)|(1<<TXEN)|(1<<RXCIE);
+	UCSRB = (1<<RXEN)|(1<<TXEN)|(1<<RXCIE)/*|(1<<TXCIE)*/;
 	UCSRC = (1<<URSEL)|(3<<UCSZ0);
 	UBRRH = 0;
 	UBRRL = 51;
 	/*
 		Initial speed for drives
 	*/
-	kappa = CPU_FREQURENCY*60/(INITIAL_F*TIMER1_DIVIDER);
+	/*kappa = CPU_FREQURENCY*60/(INITIAL_F*TIMER1_DIVIDER);*/
+	/*kappa = CPU_FREQURENCY*60/(INITIAL_F*TIMER1_DIVIDER);*/
+
+	/*
+		Extruder's temperature: ADC etc
+	*/
+	/*
+		ADC init
+		ADMUX - ADC Multiplexer Selection Register
+		REFS = 0 - AREF, Internal Vref turned off
+		ADLAR = 1 - ADC Left Adjust Result
+		MUX = 0 - use ADC0 pin (port A 0)
+
+		ADCSRA - ADC Control and Status Register A
+		ADEN = 1 - Enable ADC
+		ADSC = 1 - Start conversion
+		ADIE = 1 - ADC Interrupt Enable
+		ADPS2:0 = 111 - ADC Prescaler Select Bits = 128
+
+		SFIOR - Special FunctionIO Register
+		SFIOR = 0 - Free running mode
+	
+	*/
+	ADMUX=(1<<ADLAR);
+	ADCSRA=(1<<ADEN)|(1<<ADSC)|(1<<ADIE)|(1<<ADPS0)|(1<<ADPS1)|(1<<ADPS2);
+	SFIOR=0;
 }

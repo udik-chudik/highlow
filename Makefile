@@ -7,3 +7,4 @@ main.hex: main.elf
 	avr-objcopy -O ihex main.elf main.hex
 clean:
 	-rm main.elf main.hex
+

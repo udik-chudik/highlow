@@ -8,6 +8,16 @@
 #include "uart.h"
 #include "steps.h"
 #include "global_variables.h"
+
+
+
+
+struct vector location = {0, 0, 0, 0};
+struct vector placement = {0, 0, 0, 0};
+
+
+
+
 /*
 	G-code analyzer
 */
@@ -20,9 +30,12 @@ void AnalyzeCommand(uint8_t *buffer){
 	/*
 		Init commands
 	*/
-	uint8_t G = 0, M = 0, S = 0;
-	float x = 0, y = 0, z = 0, e = 0, f = 0;
-	uint8_t recognize_flag = 0;
+	uint8_t G = 0, M = 0;
+	//static uint8_t S = 0;
+	float x = 0, y = 0, z = 0, e = 0; /*f=0*/
+	static float f;
+	//struct vector placement;
+	uint8_t recognize_flag = 0b00000000;
 	/*
 	recognize_flag = 0b G M S x y z e f
 	*/
@@ -39,7 +52,7 @@ void AnalyzeCommand(uint8_t *buffer){
 		recognize_flag |= 0b01000000;
 	}
 	if ((base = strchr((const char*)buffer, 'S')) != NULL){
-		S = atoi(base + sizeof(uint8_t));
+	//	S = atoi(base + sizeof(uint8_t));
 		recognize_flag |= 0b00100000;
 	}
 	if ((base = strchr((const char*)buffer, 'X')) != NULL){
@@ -69,66 +82,70 @@ void AnalyzeCommand(uint8_t *buffer){
 				There was G-class command
 			*/
 			switch(G){
-				case 0:
+				case 0:	{
+					break;
+				}
 				case 1: {
-					struct vector placement = location;
+					//placement = location; 
+					/*placement.x = (float) location.x;
+					placement.y = (float) location.y;
+					placement.z = (float) location.z;
+					placement.e = (float) location.e;*/
+					/*if(placement.x == location.x) {PORTC |= (1<<PC2);}*/
 					/*
 						Calculate NULL translation vector
 					*/
 
 					if (recognize_flag & 0b00010000){
-						if (state0 & ABSOLUTE_POSITIONING){
-							/*
-								Relative positioning
-							*/
-							placement.x = location.x + x;
-						}else{
-							/*
-								Absolute positioning
-							*/
-							placement.x = x;
-						}
+						/*
+							Absolute positioning
+						*/
+						placement.x = x;
+					}else{
+						placement.x = location.x;
 					}
 					if (recognize_flag & 0b00001000){
-						if (state0 & ABSOLUTE_POSITIONING){
-							/*
-								Relative positioning
-							*/
-							placement.y = location.y + y;
-						}else{
-							/*
-								Absolute positioning
-							*/
-							placement.y = y;
-						}
+						/*
+							Absolute positioning
+						*/
+						placement.y = y;
+					}else{
+						placement.y = location.y;
 					}
 					if (recognize_flag & 0b00000100){
-						if (state0 & ABSOLUTE_POSITIONING){
-							/*
-								Relative positioning
-							*/
-							placement.z = location.z + z;
-						}else{
-							/*
-								Absolute positioning
-							*/
-							placement.z = z;
-						}
+						/*
+							Absolute positioning
+						*/
+						placement.z = z;
+					}else{
+						placement.z = location.z;
 					}
 					if (recognize_flag & 0b00000010){
-						if (state0 & ABSOLUTE_POSITIONING){
-							/*
-								Relative positioning
-							*/
-							placement.e = location.e + e;
-						}else{
-							/*
-								Absolute positioning
-							*/
-							placement.e = e;
-						}
+						/*
+							Absolute positioning
+						*/
+						placement.e = e;
+					}else{
+						placement.e = location.e;
 					}
-					moveOn(placement, f);
+					/*if (f==100) {PORTC ^= (1 << PC2);}*/
+					//if(placement.x != 0) {PORTC |= (1<<PC1);}
+					moveOn(f);
+					break;
+				}
+				case 92: {
+					location.x = 0;
+					location.y = 0;
+					location.z = 0;
+					if (recognize_flag & 0b00000010){
+						/*
+							Absolute positioning
+						*/
+						location.e = e;
+					}else{
+						location.e = 0; /*or preserves the old value?*/
+					}
+					sendStaicMessage(SUCCESS_DONE);
 					break;
 				}
 				default: {
@@ -137,6 +154,20 @@ void AnalyzeCommand(uint8_t *buffer){
 				}
 			}
 
+		}else if (recognize_flag & 0b01000000){
+			/*
+				There was M-class command
+			*/
+			switch(M){
+				
+				default: {
+					sendStaicMessage(WARNING_UNSUPPORTED_COMMAND);
+					break;
+				}
+			}
+
+		}else{
+			sendStaicMessage(WARNING_UNSUPPORTED_COMMAND);
 		}
 	}else{
 		sendStaicMessage(WARNING_NOTHING_TO_DO);
