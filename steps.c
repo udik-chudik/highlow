@@ -32,7 +32,7 @@ ISR(TIMER1_OVF_vect){
 	static int j = 0;
 	static int i = 0;
 	waitingTime +=1;
-	if (waitingTime == 2*OVERFLOWS_PER_SECOND_TIMER1) { //Это значит две секунды
+	if (waitingTime == 1*OVERFLOWS_PER_SECOND_TIMER1) { //Это значит две секунды
 		sendStaicMessage(ERROR_CHECKSUM_FAILED);
 		waitingTime = 0;
 		}

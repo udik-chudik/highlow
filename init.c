@@ -89,7 +89,7 @@ void initDevice(void){
 	UCSRB = (1<<RXEN)|(1<<TXEN)|(1<<RXCIE)/*|(1<<TXCIE)*/;
 	UCSRC = (1<<URSEL)|(3<<UCSZ0);
 	UBRRH = 0;
-	UBRRL = 51;
+	UBRRL = 207; //-> baud rate = 2400. Used to be 51 -> baud rate = 9600 
 	/*
 		Initial speed for drives
 	*/

@@ -134,16 +134,29 @@ void AnalyzeCommand(uint8_t *buffer){
 					break;
 				}
 				case 92: {
-					location.x = 0;
-					location.y = 0;
-					location.z = 0;
+					if (recognize_flag & 0b00010000){
+						/*
+							Absolute positioning
+						*/
+						location.x = x;
+					}
+					if (recognize_flag & 0b00001000){
+						/*
+							Absolute positioning
+						*/
+						location.y = y;
+					}
+					if (recognize_flag & 0b00000100){
+						/*
+							Absolute positioning
+						*/
+						location.z = z;
+					}
 					if (recognize_flag & 0b00000010){
 						/*
 							Absolute positioning
 						*/
 						location.e = e;
-					}else{
-						location.e = 0; /*or preserves the old value?*/
 					}
 					sendStaicMessage(SUCCESS_DONE);
 					break;
