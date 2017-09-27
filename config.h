@@ -29,7 +29,7 @@
 #define NEW_TASK 0b10000000
 #define STEPS_PER_X 5
 #define STEPS_PER_Y 5
-#define STEPS_PER_Z 5
+#define STEPS_PER_Z 304
 #define STEPS_PER_E 5
 #define MAX_ALLOWED_SPEED_X 5000
 #define MAX_ALLOWED_SPEED_Y 5000
