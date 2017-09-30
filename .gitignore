@@ -1,3 +1,4 @@
 *.elf
 *.s
 *.hex
+*.elf.asm
