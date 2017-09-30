@@ -32,12 +32,9 @@ uint8_t checkCRC(uint8_t *input_buffer){
 		CRC = (CRC << 3) + (uint16_t) input_buffer[i];
 		CRC = (CRC << 3) + (uint16_t) input_buffer[i];
 		CRC = (CRC ^ (CRC >> 8));
-		//if (input_buffer[i] == 'R') PORTC |= (1<<PC0);
-		//sendCharter((uint8_t)CRC);
 		i++;
 	}
 	i++;
-	//sendCharter((uint8_t)CRC);
 	if (input_buffer[i] == (uint8_t)CRC){
 		return 1;
 	}else{
@@ -52,21 +49,24 @@ ISR(USART_RXC_vect){
 	/*
 		Init static variables
 	*/
-	/*static uint8_t k = 0;*/
+	static uint8_t k = 0;
 	static uint8_t buffer[BUFFER_LENGTH];
 	static uint8_t bufferSwap[BUFFER_LENGTH];
 	static uint8_t was_comment = 0;
-	static int k = 0;
+
 	/*
 		Read charter
 	*/
 	uint8_t charter = UDR;
+	/*
+		Check line ending
+	*/
 	if ((charter != '\n') && (charter != '\r')){
 		/*
 			Fill the buffer
 		*/
 		if (charter == ';'){
-			was_comment = 1;
+			was_comment = 0;
 		}
 		if (k < BUFFER_LENGTH){
 			if (!was_comment){

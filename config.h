@@ -17,6 +17,9 @@
 #define CLEAR_E 0b11110000
 
 
+#define WAS_OWERFOLLOW 0b00000001
+#define WAS_COMMENT 0b00000010
+
 #define PHASE_LENGTH 8
 #define BUFFER_LENGTH 64
 #define ERROR_BUFFER_OVERFOLLOW PSTR("Error: the commant buffer full!\n")
