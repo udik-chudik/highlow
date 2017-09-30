@@ -4,8 +4,8 @@
 #include "config.h"
 #ifndef GLOBALVARIABLES_H
 #define GLOBALVARIABLES_H
-//static struct vector location = {0, 0, 0, 0};
-//static struct vector placement = {0, 0, 0, 0};
+static struct vector location = {0, 0, 0, 0};
+static struct vector placement = {0, 0, 0, 0};
 
 
 /*

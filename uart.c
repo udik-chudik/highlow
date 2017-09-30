@@ -52,7 +52,7 @@ ISR(USART_RXC_vect){
 	static uint8_t k = 0;
 	static uint8_t buffer[BUFFER_LENGTH];
 	static uint8_t bufferSwap[BUFFER_LENGTH];
-	static uint8_t was_comment = 0;
+	static uint8_t mode = 0;
 
 	/*
 		Read charter
@@ -66,44 +66,59 @@ ISR(USART_RXC_vect){
 			Fill the buffer
 		*/
 		if (charter == ';'){
-			was_comment = 0;
+			mode |= 0;
 		}
 		if (k < BUFFER_LENGTH){
-			if (!was_comment){
+			if (~mode & WAS_COMMENT){
 				buffer[k] = charter;
 				k++;
 			}
 		}else{
+			/*
+				If overfollow occured
+			*/
+			mode |= WAS_OVERFOLLOW;
+		}
+	}else{
+		buffer[k] = charter;
+		if (~mode & WAS_OVERFOLLOW){
+			/*
+				If there wasn`t overfollow
+			*/
+
+			/*
+				Clear the buffer before analyzing
+			*/
 			for (k = BUFFER_LENGTH - 1; k >= 0; k--){
 				bufferSwap[k]=buffer[k];
 				buffer[k] = 0;
 			}
-			k=0;
-			sendStaicMessage(ERROR_BUFFER_OVERFOLLOW);
-		}
-	}else{
-		buffer[k] = charter;
-		/*
-			Clear the buffer before analyzing
-		*/
-		for (k = BUFFER_LENGTH - 1; k >= 0; k--){
-			bufferSwap[k]=buffer[k];
-			buffer[k] = 0;
-		}
-		k=0;
-		/*
-			The command have been arrived.
-			Lets analyze it!
-		*/
-		if (checkCRC(bufferSwap) || was_comment){ //Кастыль
-			AnalyzeCommand(bufferSwap);
+			/*
+				The command have been arrived.
+				Lets analyze it!
+			*/
+			if (checkCRC(bufferSwap) || ~mode & WAS_COMMENT){ //Кастыль
+				AnalyzeCommand(bufferSwap);
+			}else{
+				sendStaicMessage(ERROR_CHECKSUM_FAILED);
+			}
+			mode = 0;
 		}else{
-			sendStaicMessage(ERROR_CHECKSUM_FAILED);
+			/*
+				Send error message if the buffer was overfollowed
+			*/
+			sendStaicMessage(ERROR_BUFFER_OVERFOLLOW);
+			/*
+				Clear the buffer, ignore content
+			*/
+			for (k = 0; k < BUFFER_LENGTH; k++){
+				buffer[k] = 0;
+			}
+			k = 0;
+			/*
+				Wait for next command
+			*/
+			mode = 0;
 		}
-		was_comment = 0;
-
-
-
 	}
-
 }
