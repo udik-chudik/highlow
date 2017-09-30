@@ -66,7 +66,7 @@ ISR(USART_RXC_vect){
 			Fill the buffer
 		*/
 		if (charter == ';'){
-			was_comment = 1;
+			was_comment = 0;
 		}
 		if (k < BUFFER_LENGTH){
 			if (!was_comment){
@@ -74,11 +74,12 @@ ISR(USART_RXC_vect){
 				k++;
 			}
 		}else{
-			for (k = BUFFER_LENGTH - 1; k >= 0; k--){
+			/*for (k = BUFFER_LENGTH - 1; k >= 0; k--){
 				bufferSwap[k]=buffer[k];
 				buffer[k] = 0;
 			}
 			k=0;
+*/
 			sendStaicMessage(ERROR_BUFFER_OVERFOLLOW);
 		}
 	}else{
@@ -95,7 +96,7 @@ ISR(USART_RXC_vect){
 			The command have been arrived.
 			Lets analyze it!
 		*/
-		if (checkCRC(bufferSwap) || was_comment){ //Кастыль
+		if (checkCRC(bufferSwap)){ //Кастыль
 			AnalyzeCommand(bufferSwap);
 		}else{
 			sendStaicMessage(ERROR_CHECKSUM_FAILED);
