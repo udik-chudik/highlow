@@ -30,6 +30,9 @@
 #define ERROR_CHECKSUM_FAILED PSTR("rs\n")
 #define SUCCESS_DONE PSTR("ok\n")
 #define WARNING_WAITING PSTR("_\n")
+
+#define START_MESSAGE PSTR("start\n")
+
 #define ABSOLUTE_POSITIONING 0b01000000
 #define NEW_TASK 0b10000000
 #define STEPS_PER_X 5

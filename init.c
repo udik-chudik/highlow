@@ -1,5 +1,6 @@
 #include "init.h"
 #include <avr/io.h>
+#include <avr/interrupt.h>
 #include "global_variables.h"
 /*
 	Init global variables
@@ -10,6 +11,7 @@
 	uint8_t state0 = 0;
 
 void initDevice(void){
+	
 	/*
 	Configure ports
 	*/
@@ -127,6 +129,5 @@ void initDevice(void){
 	ADMUX=(1<<ADLAR);
 	ADCSRA=(1<<ADEN)|(1<<ADSC)|(1<<ADIE)|(1<<ADPS0)|(1<<ADPS1)|(1<<ADPS2);
 	SFIOR=0;
-
 	
 }
