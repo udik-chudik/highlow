@@ -5,6 +5,7 @@
 #include <avr/interrupt.h>
 #include "gcode.h"
 #include <avr/pgmspace.h>
+#include "global_variables.h"
 /*
 	Uart operations
 */
@@ -24,15 +25,14 @@ void sendStaicMessage(const char *string){
 	}
 }
 uint8_t checkCRC(uint8_t *input_buffer){
-
 	uint16_t CRC = 0;
 	int i = 0;
-
 	while (input_buffer[i] != '*'){
 		CRC = (CRC << 3) + (uint16_t) input_buffer[i];
 		CRC = (CRC << 3) + (uint16_t) input_buffer[i];
 		CRC = (CRC ^ (CRC >> 8));
 		i++;
+		if (i == BUFFER_LENGTH) return 0;
 	}
 	i++;
 	if (input_buffer[i] == (uint8_t)CRC){
@@ -49,7 +49,7 @@ ISR(USART_RXC_vect){
 	/*
 		Init static variables
 	*/
-	static uint8_t k = 0;
+	static uint16_t k = 0;
 	static uint8_t buffer[BUFFER_LENGTH];
 	static uint8_t bufferSwap[BUFFER_LENGTH];
 	static uint8_t mode = 0;
@@ -57,6 +57,7 @@ ISR(USART_RXC_vect){
 	/*
 		Read charter
 	*/
+	while ( !(UCSRA & (1 << RXC)) );
 	uint8_t charter = UDR;
 	/*
 		Check line ending
@@ -69,7 +70,7 @@ ISR(USART_RXC_vect){
 			mode |= 0;
 		}
 		if (k < BUFFER_LENGTH){
-			if (~mode & WAS_COMMENT){
+			if (!(mode & WAS_COMMENT)){
 				buffer[k] = charter;
 				k++;
 			}
@@ -81,7 +82,7 @@ ISR(USART_RXC_vect){
 		}
 	}else{
 		buffer[k] = charter;
-		if (~mode & WAS_OVERFOLLOW){
+		if (!(mode & WAS_OVERFOLLOW)){
 			/*
 				If there wasn`t overfollow
 			*/
@@ -89,20 +90,23 @@ ISR(USART_RXC_vect){
 			/*
 				Clear the buffer before analyzing
 			*/
-			for (k = BUFFER_LENGTH - 1; k >= 0; k--){
+			for (k = 0; k < BUFFER_LENGTH; k++){
 				bufferSwap[k]=buffer[k];
 				buffer[k] = 0;
 			}
+
 			/*
 				The command have been arrived.
 				Lets analyze it!
 			*/
-			if (checkCRC(bufferSwap) || ~mode & WAS_COMMENT){ //Кастыль
+			if ( ((state0 & CRC_CHECK_ENABLED) && checkCRC(bufferSwap)) || !(state0 & CRC_CHECK_ENABLED) ){
+				
 				AnalyzeCommand(bufferSwap);
 			}else{
 				sendStaicMessage(ERROR_CHECKSUM_FAILED);
 			}
 			mode = 0;
+			k = 0;
 		}else{
 			/*
 				Send error message if the buffer was overfollowed

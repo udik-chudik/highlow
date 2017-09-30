@@ -162,7 +162,20 @@ void AnalyzeCommand(uint8_t *buffer){
 				There was M-class command
 			*/
 			switch(M){
-				
+				case 50:
+					/*
+						Enable CRC check
+					*/
+					state0 |= CRC_CHECK_ENABLED;
+					sendStaicMessage(SUCCESS_DONE);
+					break;
+				case 51:
+					/*
+						Disable CRC check
+					*/
+					state0 &= ~CRC_CHECK_ENABLED;
+					sendStaicMessage(SUCCESS_DONE);
+					break;
 				default: {
 					sendStaicMessage(WARNING_UNSUPPORTED_COMMAND);
 					break;
