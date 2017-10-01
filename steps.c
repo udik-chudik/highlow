@@ -41,8 +41,8 @@ ISR(TIMER1_OVF_vect){
 		if (j < kappa){
 			j++;
 			/*Для охлаждения*/
-			PORTC = 0b00000000;
-			PORTB = 0b00000000;
+			//PORTC = 0b00000000;
+			//PORTB = 0b00000000;
 		}else{
 			//PORTC = (1<<PC3);
 			j = 0;
@@ -112,7 +112,7 @@ ISR(TIMER1_OVF_vect){
 				i = 0;
 				/*Для охлаждения*/
 				PORTC = 0b00000000;
-				PORTB = 0b00000000;
+				PORTB &= ~CLEAR_E;
 				sendStaicMessage(SUCCESS_DONE);
 			}
 		}
@@ -131,7 +131,7 @@ ISR(TIMER1_OVF_vect){
 		j = 0;
 		/*Для охлаждения*/
 		PORTC = 0b00000000;
-		PORTB = 0b00000000;
+		PORTB &= ~CLEAR_E;
 		sendStaicMessage(SUCCESS_DONE);
 	}
 }
