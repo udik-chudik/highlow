@@ -1,7 +1,17 @@
 #include "init.h"
 #include <avr/io.h>
-//#include "steps.h"
+#include <avr/interrupt.h>
+#include "global_variables.h"
+/*
+	Init global variables
+*/
+	struct vector placement = {0,0,0,0};
+	struct vector location = {0,0,0,0};
+
+	uint8_t state0 = 0;
+
 void initDevice(void){
+	
 	/*
 	Configure ports
 	*/
@@ -43,7 +53,7 @@ void initDevice(void){
 			1 - small pulse width
 			200 - big pulse width
 	*/
-	OCR0 = 20;
+	OCR0 = 250;
 	/*
 		Enable interrupt on overfolow and compare match
 	*/
@@ -86,7 +96,7 @@ void initDevice(void){
 		UBRR -> baud rate 9600
 	*/
 
-	UCSRB = (1<<RXEN)|(1<<TXEN)|(1<<RXCIE)/*|(1<<TXCIE)*/;
+	UCSRB = (1<<RXEN)|(1<<TXEN)|(1<<RXCIE);
 	UCSRC = (1<<URSEL)|(3<<UCSZ0);
 	UBRRH = 0;
 	UBRRL = 207; //-> baud rate = 2400. Used to be 51 -> baud rate = 9600 
@@ -119,4 +129,5 @@ void initDevice(void){
 	ADMUX=(1<<ADLAR);
 	ADCSRA=(1<<ADEN)|(1<<ADSC)|(1<<ADIE)|(1<<ADPS0)|(1<<ADPS1)|(1<<ADPS2);
 	SFIOR=0;
+	
 }

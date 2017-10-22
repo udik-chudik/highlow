@@ -11,10 +11,10 @@
 
 
 
-
+/*
 struct vector location = {0, 0, 0, 0};
 struct vector placement = {0, 0, 0, 0};
-
+*/
 
 
 
@@ -31,10 +31,8 @@ void AnalyzeCommand(uint8_t *buffer){
 		Init commands
 	*/
 	uint8_t G = 0, M = 0;
-	//static uint8_t S = 0;
-	float x = 0, y = 0, z = 0, e = 0; /*f=0*/
+	float x = 0, y = 0, z = 0, e = 0;
 	static float f;
-	//struct vector placement;
 	uint8_t recognize_flag = 0b00000000;
 	/*
 	recognize_flag = 0b G M S x y z e f
@@ -86,12 +84,6 @@ void AnalyzeCommand(uint8_t *buffer){
 					break;
 				}
 				case 1: {
-					//placement = location; 
-					/*placement.x = (float) location.x;
-					placement.y = (float) location.y;
-					placement.z = (float) location.z;
-					placement.e = (float) location.e;*/
-					/*if(placement.x == location.x) {PORTC |= (1<<PC2);}*/
 					/*
 						Calculate NULL translation vector
 					*/
@@ -128,8 +120,6 @@ void AnalyzeCommand(uint8_t *buffer){
 					}else{
 						placement.e = location.e;
 					}
-					/*if (f==100) {PORTC ^= (1 << PC2);}*/
-					//if(placement.x != 0) {PORTC |= (1<<PC1);}
 					moveOn(f);
 					break;
 				}
@@ -172,7 +162,20 @@ void AnalyzeCommand(uint8_t *buffer){
 				There was M-class command
 			*/
 			switch(M){
-				
+				case 50:
+					/*
+						Enable CRC check
+					*/
+					state0 |= CRC_CHECK_ENABLED;
+					sendStaicMessage(SUCCESS_DONE);
+					break;
+				case 51:
+					/*
+						Disable CRC check
+					*/
+					state0 &= ~CRC_CHECK_ENABLED;
+					sendStaicMessage(SUCCESS_DONE);
+					break;
 				default: {
 					sendStaicMessage(WARNING_UNSUPPORTED_COMMAND);
 					break;

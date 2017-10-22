@@ -10,20 +10,17 @@
 #include "config.h"
 
 
-extern struct vector location;
-extern struct vector placement;
-
 const char DRIVE_PHASES_X[] = {0b10000000,0b11000000,0b01000000,0b01100000,0b00100000,0b00110000,0b00010000,0b10010000};
 const char DRIVE_PHASES_Y[] = {0b00001000,0b00001100,0b00000100,0b00000110,0b00000010,0b00000011,0b00000001,0b00001001};
 const char DRIVE_PHASES_Z[] = {0b10000000,0b11000000,0b01000000,0b01100000,0b00100000,0b00110000,0b00010000,0b10010000};
-const char DRIVE_PHASES_E[] = {0b00001000,0b00001100,0b00000100,0b00000110,0b00000010,0b00000011,0b00000001,0b00001001};
-
+//const char DRIVE_PHASES_E[] = {0b00001000,0b00001100,0b00000100,0b00000110,0b00000010,0b00000011,0b00000001,0b00001001};
+const char DRIVE_PHASES_E[] = {0b00001001,0b00000001,0b00000011,0b00000010,0b00000110,0b00000100,0b00001100,0b00001000};
 
 
 static struct discret_vector translation_discret = {0,0,0,0};
 static long translation_discret_length = 0;
 static struct discret_vector progress;
-static uint8_t state0 = 0b00000000;
+//static uint8_t state0 = 0b00000000;
 static int kappa = (OVERFLOWS_PER_SECOND_TIMER1*60)/(STEPS_PER_X*INITIAL_F);
 
 
@@ -33,19 +30,19 @@ ISR(TIMER1_OVF_vect){
 	static int i = 0;
 	waitingTime +=1;
 	if (waitingTime == 1*OVERFLOWS_PER_SECOND_TIMER1) { //Это значит две секунды
-		sendStaicMessage(ERROR_CHECKSUM_FAILED);
+		//sendStaicMessage(ERROR_CHECKSUM_FAILED);
 		waitingTime = 0;
 		}
 	/*static int j = 0;*/
-	if ((state0 == NEW_TASK) && (translation_discret_length != 0)){
+	if ((state0 & NEW_TASK) && (translation_discret_length != 0)){
 		waitingTime = 0;
 		/*PORTC |= (1<<PC1);*/
 		//PORTC |= (1<<PC0);
 		if (j < kappa){
 			j++;
 			/*Для охлаждения*/
-			PORTC = 0b00000000;
-			PORTB = 0b00000000;
+			//PORTC = 0b00000000;
+			//PORTB = 0b00000000;
 		}else{
 			//PORTC = (1<<PC3);
 			j = 0;
@@ -115,7 +112,7 @@ ISR(TIMER1_OVF_vect){
 				i = 0;
 				/*Для охлаждения*/
 				PORTC = 0b00000000;
-				PORTB = 0b00000000;
+				PORTB &= ~CLEAR_E;
 				sendStaicMessage(SUCCESS_DONE);
 			}
 		}
@@ -128,13 +125,13 @@ ISR(TIMER1_OVF_vect){
 			j++;
 		}
 		*/
-	}else if ((state0 == NEW_TASK) && (translation_discret_length == 0)){
+	}else if ((state0 & NEW_TASK) && (translation_discret_length == 0)){
 		state0 &= ~NEW_TASK;
 		i = 0;
 		j = 0;
 		/*Для охлаждения*/
 		PORTC = 0b00000000;
-		PORTB = 0b00000000;
+		PORTB &= ~CLEAR_E;
 		sendStaicMessage(SUCCESS_DONE);
 	}
 }
@@ -237,7 +234,7 @@ void moveOn(float F){ /*Здесь ошибка*/
 	/*
 		Let's move!
 	*/
-	state0 = NEW_TASK;
+	state0 |= NEW_TASK;
 }
 
 void doStep(signed char motor){

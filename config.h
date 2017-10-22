@@ -5,7 +5,10 @@
 /*соответственно максимально возможная скорость -- это 3 м/мин достигается при F=6000*/
 #define CPU_FREQURENCY 8000000
 #define PWM_PORT PORTA
-#define PWM_PIN PORTA7
+#define ENABLE_E PORTA4
+#define ENABLE_Z PORTA5
+#define ENABLE_X PORTA6
+#define ENABLE_Y PORTA7
 
 #define PORT_X PORTC
 #define CLEAR_X 0b00001111
@@ -17,23 +20,28 @@
 #define CLEAR_E 0b11110000
 
 
-#define WAS_OWERFOLLOW 0b00000001
+#define WAS_OVERFOLLOW 0b00000001
 #define WAS_COMMENT 0b00000010
+
+#define CRC_CHECK_ENABLED 0b00100000
 
 #define PHASE_LENGTH 8
 #define BUFFER_LENGTH 64
-#define ERROR_BUFFER_OVERFOLLOW PSTR("Error: the commant buffer full!\n")
+#define ERROR_BUFFER_OVERFOLLOW PSTR("Error: the command buffer full!\n")
 #define WARNING_NOTHING_TO_DO PSTR("Warning: nothing to do!\n")
 #define WARNING_UNSUPPORTED_COMMAND PSTR("Warning: unsupported command!\n")
 #define ERROR_CHECKSUM_FAILED PSTR("rs\n")
 #define SUCCESS_DONE PSTR("ok\n")
 #define WARNING_WAITING PSTR("_\n")
+
+#define START_MESSAGE PSTR("start\n")
+
 #define ABSOLUTE_POSITIONING 0b01000000
 #define NEW_TASK 0b10000000
 #define STEPS_PER_X 5
 #define STEPS_PER_Y 5
 #define STEPS_PER_Z 304
-#define STEPS_PER_E 5
+#define STEPS_PER_E 10
 #define MAX_ALLOWED_SPEED_X 5000
 #define MAX_ALLOWED_SPEED_Y 5000
 #define MAX_ALLOWED_SPEED_Z 1000
