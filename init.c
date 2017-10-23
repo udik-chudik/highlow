@@ -53,7 +53,7 @@ void initDevice(void){
 			1 - small pulse width
 			200 - big pulse width
 	*/
-	OCR0 = 20;
+	OCR0 = 50;
 	/*
 		Enable interrupt on overfolow and compare match
 	*/

@@ -2,6 +2,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include "config.h"
+#include "global_variables.h"
 
 unsigned char getTemperature(unsigned char adc_value){
 	return 127+83*adc_value/100;
@@ -17,14 +18,28 @@ ISR(TIMER0_COMP_vect, ISR_NAKED){
 	/*
 		When executed -> set PWM_PIN to 0
 	*/
-	PWM_PORT &= ~(1<<PWM_PIN);
+	if (state0 & NEW_TASK){
+
+
+
+	}else{
+		PWM_PORT &= ~(1<<ENABLE_X);
+		PWM_PORT &= ~(1<<ENABLE_Y);
+		PWM_PORT &= ~(1<<ENABLE_Z);
+		PWM_PORT &= ~(1<<ENABLE_E);
+	}
+
 	reti();
 }
 ISR(TIMER0_OVF_vect, ISR_NAKED){
 	/*
 		When executed -> set PWM_PIN to 1
 	*/
-	PWM_PORT |= (1<<PWM_PIN);
+
+	PWM_PORT |= (1<<ENABLE_X);
+	PWM_PORT |= (1<<ENABLE_Y);
+	PWM_PORT |= (1<<ENABLE_Z);
+	PWM_PORT |= (1<<ENABLE_E);
 	reti();
 }
 
