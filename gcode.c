@@ -176,6 +176,13 @@ void AnalyzeCommand(uint8_t *buffer){
 					state0 &= ~CRC_CHECK_ENABLED;
 					sendStaicMessage(SUCCESS_DONE);
 					break;
+				case 105:
+					/*
+						Get Temperature
+					*/
+					sendCharter(current_temperature);
+					sendCharter(current_temperature_bed);
+					break;
 				default: {
 					sendStaicMessage(WARNING_UNSUPPORTED_COMMAND);
 					break;

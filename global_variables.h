@@ -8,7 +8,8 @@ extern struct vector location;
 extern struct vector placement;
 
 extern uint8_t state0;
-
+extern unsigned char current_temperature;
+extern unsigned char current_temperature_bed;
 /*
 	state0 - control byte
 	0b

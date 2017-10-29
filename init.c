@@ -7,7 +7,8 @@
 */
 	struct vector placement = {0,0,0,0};
 	struct vector location = {0,0,0,0};
-
+	unsigned char current_temperature = 0;
+	unsigned char current_temperature_bed = 0;
 	uint8_t state0 = 0;
 
 void initDevice(void){
@@ -21,18 +22,18 @@ void initDevice(void){
 	*/
 	DDRC = 0xFF;
 	/*
-		PORTA - 0b0000000A - ADC0 - input for extruder temperature control
+		PORTA - 0b000000BE - ADC0 - input for extruder temperature control
 	*/
-	DDRA = 0xFE;
+	DDRA = 0xFC;
 	/*
 		PORTB - 0bZZZZ0000 - high 4 bits Z-axis stepper motor
 		PORTB - 0b0000EEEE - low 4 bits E-axis stepper motor
 	*/
 	DDRB = 0xFF;
 	/*
-		PORTD - 0bE0000000 - 7th bit out fot extruder heater
+		PORTD - 0bEB000000 - 7th bit out fot extruder heater
 	*/
-	DDRD = (1<<PORTD7);
+	DDRD = EXTRUDER_HEATER_ON|BED_HEATER_ON;
 	/*
 		Internal timers initialization
 	*/
@@ -53,7 +54,7 @@ void initDevice(void){
 			1 - small pulse width
 			200 - big pulse width
 	*/
-	OCR0 = 250;
+	OCR0 = 50;
 	/*
 		Enable interrupt on overfolow and compare match
 	*/
