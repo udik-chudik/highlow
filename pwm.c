@@ -27,15 +27,18 @@ ISR(TIMER0_COMP_vect, ISR_NAKED){
 	/*
 		When executed -> set PWM_PIN to 0
 	*/
+
 	if (state0 & NEW_TASK){
-
-
+		PWM_PORT |= (1<<ENABLE_X);
+		PWM_PORT |= (1<<ENABLE_Y);
+		PWM_PORT |= (1<<ENABLE_Z);
+		PWM_PORT |= (1<<ENABLE_E);
 
 	}else{
 		PWM_PORT &= ~(1<<ENABLE_X);
 		PWM_PORT &= ~(1<<ENABLE_Y);
 		PWM_PORT &= ~(1<<ENABLE_Z);
-		PWM_PORT &= ~(1<<ENABLE_E);
+		//PWM_PORT &= ~(1<<ENABLE_E);
 	}
 
 	reti();
@@ -44,11 +47,13 @@ ISR(TIMER0_OVF_vect, ISR_NAKED){
 	/*
 		When executed -> set PWM_PIN to 1
 	*/
-
+/*
 	PWM_PORT |= (1<<ENABLE_X);
 	PWM_PORT |= (1<<ENABLE_Y);
 	PWM_PORT |= (1<<ENABLE_Z);
 	PWM_PORT |= (1<<ENABLE_E);
+
+*/
 	reti();
 }
 
