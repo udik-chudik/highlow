@@ -187,7 +187,8 @@ void moveOn(float F){ /*Здесь ошибка*/
 	Смысл F - это скорость движения, выраженная в мм/мин	
 	*/
 	if (F>6000){F=6000;}
-	if (F<900){F=900;} //на случай багов в приёме	
+	
+	//if (F<900){F=900;} //на случай багов в приёме	
 	//F=6000;
 	/*
 		Calculate speed if F changed
@@ -198,16 +199,16 @@ void moveOn(float F){ /*Здесь ошибка*/
 			Check for speed limit
 		*/
 		
-		if (F*abs(translation.x)/translation_length > MAX_ALLOWED_SPEED_X){
+		if ((translation.x != 0) && (F*abs(translation.x)/translation_length > MAX_ALLOWED_SPEED_X)){
 			F = MAX_ALLOWED_SPEED_X*translation_length/abs(translation.x);
 		}
-		if (F*abs(translation.y)/translation_length > MAX_ALLOWED_SPEED_Y){
+		if ((translation.y != 0) && (F*abs(translation.y)/translation_length > MAX_ALLOWED_SPEED_Y)){
 			F = MAX_ALLOWED_SPEED_Y*translation_length/abs(translation.y);
 		}
-		if (F*abs(translation.z)/translation_length > MAX_ALLOWED_SPEED_Z){
+		if ((translation.z != 0) && (F*abs(translation.z)/translation_length > MAX_ALLOWED_SPEED_Z)){
 			F = MAX_ALLOWED_SPEED_Z*translation_length/abs(translation.z);
 		}
-		if (F*abs(translation.e)/translation_length > MAX_ALLOWED_SPEED_E){
+		if ((translation.e != 0) && (F*abs(translation.e)/translation_length > MAX_ALLOWED_SPEED_E)){
 			F = MAX_ALLOWED_SPEED_E*translation_length/abs(translation.e);
 		}
 		

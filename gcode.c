@@ -32,7 +32,7 @@ void AnalyzeCommand(uint8_t *buffer){
 	*/
 	uint8_t G = 0, M = 0;
 	float x = 0, y = 0, z = 0, e = 0;
-	static float f;
+	static float f = INITIAL_F;
 	uint8_t recognize_flag = 0b00000000;
 	/*
 	recognize_flag = 0b G M S x y z e f
@@ -125,7 +125,7 @@ void AnalyzeCommand(uint8_t *buffer){
 				}
 				case 92: {
 					if (recognize_flag & 0b00010000){
-						/*
+						/*b
 							Absolute positioning
 						*/
 						location.x = x;
