@@ -35,6 +35,12 @@ ISR(TIMER1_OVF_vect){
 		}
 	/*static int j = 0;*/
 	if ((state0 & NEW_TASK) && (translation_discret_length != 0)){
+
+		PWM_PORT |= (1<<ENABLE_X);
+		PWM_PORT |= (1<<ENABLE_Y);
+		PWM_PORT |= (1<<ENABLE_Z);
+		PWM_PORT |= (1<<ENABLE_E);
+		
 		waitingTime = 0;
 		/*PORTC |= (1<<PC1);*/
 		//PORTC |= (1<<PC0);
@@ -108,12 +114,13 @@ ISR(TIMER1_OVF_vect){
 				/*
 					When task has been complete
 				*/
-				state0 &= ~NEW_TASK;
+				translation_discret_length = 0;
+				//state0 &= ~NEW_TASK;
 				i = 0;
-				/*Для охлаждения*/
-				PORTC = 0b00000000;
-				PORTB &= ~CLEAR_E;
-				sendStaicMessage(SUCCESS_DONE);
+				/*Для */
+				//PORTC = 0b00000000;
+				//PORTB &= ~CLEAR_E;
+				//sendStaicMessage(SUCCESS_DONE);
 			}
 		}
 		/*
@@ -130,9 +137,10 @@ ISR(TIMER1_OVF_vect){
 		i = 0;
 		j = 0;
 		/*Для охлаждения*/
-		PORTC = 0b00000000;
-		PORTB &= ~CLEAR_E;
-		sendStaicMessage(SUCCESS_DONE);
+		//PORTC = 0b00000000;
+		//PORTB &= ~CLEAR_E;
+		//sendStaicMessage(SUCCESS_DONE);
+		sendStaicMessage(PSTR("OK\n"));
 	}
 }
 
