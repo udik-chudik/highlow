@@ -20,20 +20,12 @@ const char DRIVE_PHASES_E[] = {0b00001001,0b00000001,0b00000011,0b00000010,0b000
 static struct discret_vector translation_discret = {0,0,0,0};
 static long translation_discret_length = 0;
 static struct discret_vector progress;
-//static uint8_t state0 = 0b00000000;
-static int kappa = (OVERFLOWS_PER_SECOND_TIMER1*60)/(STEPS_PER_X*INITIAL_F);
+static long counter;
+static long kappa; // = (TIMER1_FREQURENCY*60)/(STEPS_PER_X*INITIAL_F);
 
 
 ISR(TIMER1_OVF_vect){
-	static int waitingTime = 0;	
-	static int j = 0;
 	static int i = 0;
-	waitingTime +=1;
-	if (waitingTime == 1*OVERFLOWS_PER_SECOND_TIMER1) { //Это значит две секунды
-		//sendStaicMessage(ERROR_CHECKSUM_FAILED);
-		waitingTime = 0;
-		}
-	/*static int j = 0;*/
 	if ((state0 & NEW_TASK) && (translation_discret_length != 0)){
 
 		PWM_PORT |= (1<<ENABLE_X);
@@ -41,105 +33,80 @@ ISR(TIMER1_OVF_vect){
 		PWM_PORT |= (1<<ENABLE_Z);
 		PWM_PORT |= (1<<ENABLE_E);
 		
-		waitingTime = 0;
-		/*PORTC |= (1<<PC1);*/
-		//PORTC |= (1<<PC0);
-		if (j < kappa){
-			j++;
-			/*Для охлаждения*/
-			//PORTC = 0b00000000;
-			//PORTB = 0b00000000;
-		}else{
-			//PORTC = (1<<PC3);
-			j = 0;
-			if (translation_discret.x > 0){
-				if (progress.x < i*translation_discret.x/translation_discret_length){
-					progress.x += 1;
-					location.x += 1.0/STEPS_PER_X;
-					doStep(INC_X);
-				}
-			}else if (translation_discret.x < 0){
-				if (progress.x > i*translation_discret.x/translation_discret_length){
-					progress.x -= 1;
-					location.x -= 1.0/STEPS_PER_X;
-					doStep(DEC_X);
-				}
-			}
 
-			if (translation_discret.y > 0){
-				if (progress.y < i*translation_discret.y/translation_discret_length){
-					progress.y += 1;
-					location.y += 1.0/STEPS_PER_Y;
-					doStep(INC_Y);
-				}
-			}else if (translation_discret.y < 0){
-				if (progress.y > i*translation_discret.y/translation_discret_length){
-					progress.y -= 1;
-					location.y -= 1.0/STEPS_PER_Y;
-					doStep(DEC_Y);
-				}
-			}
 
-			if (translation_discret.z > 0){
-				if (progress.z < i*translation_discret.z/translation_discret_length){
-					progress.z += 1;
-					location.z += 1.0/STEPS_PER_Z;
-					doStep(INC_Z);
-				}
-			}else if (translation_discret.z < 0){
-				if (progress.z > i*translation_discret.z/translation_discret_length){
-					progress.z -= 1;
-					location.z -= 1.0/STEPS_PER_Z;
-					doStep(DEC_Z);
-				}
+		if (translation_discret.x > 0){
+			if (progress.x < i*translation_discret.x/translation_discret_length){
+				progress.x += 1;
+				location.x += 1.0/STEPS_PER_X;
+				doStep(INC_X);
 			}
-
-			if (translation_discret.e > 0){
-				if (progress.e < i*translation_discret.e/translation_discret_length){
-					progress.e += 1;
-					location.e += 1.0/STEPS_PER_E;
-					doStep(INC_E);
-				}
-			}else if (translation_discret.e < 0){
-				if (progress.e > i*translation_discret.e/translation_discret_length){
-					progress.e -= 1;
-					location.e -= 1.0/STEPS_PER_E;
-					doStep(DEC_E);
-				}
+		}else if (translation_discret.x < 0){
+			if (progress.x > i*translation_discret.x/translation_discret_length){
+				progress.x -= 1;
+				location.x -= 1.0/STEPS_PER_X;
+				doStep(DEC_X);
 			}
-
-			if (i < translation_discret_length){
-				i++;
+		}
+		if (translation_discret.y > 0){
+			if (progress.y < i*translation_discret.y/translation_discret_length){
+				progress.y += 1;
+				location.y += 1.0/STEPS_PER_Y;
+				doStep(INC_Y);
+			}
+		}else if (translation_discret.y < 0){
+			if (progress.y > i*translation_discret.y/translation_discret_length){
+				progress.y -= 1;
+				location.y -= 1.0/STEPS_PER_Y;
+				doStep(DEC_Y);
+			}
+		}
+		if (translation_discret.z > 0){
+			if (progress.z < i*translation_discret.z/translation_discret_length){
+				progress.z += 1;
+				location.z += 1.0/STEPS_PER_Z;
+				doStep(INC_Z);
+			}
+		}else if (translation_discret.z < 0){
+			if (progress.z > i*translation_discret.z/translation_discret_length){
+				progress.z -= 1;
+				location.z -= 1.0/STEPS_PER_Z;
+				doStep(DEC_Z);
+			}
+		}
+		if (translation_discret.e > 0){
+			if (progress.e < i*translation_discret.e/translation_discret_length){
+				progress.e += 1;
+				location.e += 1.0/STEPS_PER_E;
+				doStep(INC_E);
+			}
+		}else if (translation_discret.e < 0){
+			if (progress.e > i*translation_discret.e/translation_discret_length){
+				progress.e -= 1;
+				location.e -= 1.0/STEPS_PER_E;
+				doStep(DEC_E);
+			}
+		}
+		if (i < translation_discret_length){
+			i++;
+			counter = counter - 2*counter/(4*i + 1);
+			if (counter >= kappa){
+				OCR1A = counter;
 			}else{
-				/*
-					When task has been complete
-				*/
-				translation_discret_length = 0;
-				//state0 &= ~NEW_TASK;
-				i = 0;
-				/*Для */
-				//PORTC = 0b00000000;
-				//PORTB &= ~CLEAR_E;
-				//sendStaicMessage(SUCCESS_DONE);
+				OCR1A = kappa;
 			}
-		}
-		/*
-		PORT_X &= CLEAR_X;
-		PORT_X |= pgm_read_byte(driveX + j);
-		if ( j == PHASE_LENGTH - 1){
-			j = 0;
+			//OCR1A = OCR1A - 2*OCR1A/(4*i + 1);
 		}else{
-			j++;
+			/*
+				When task has been complete
+			*/
+			translation_discret_length = 0;
 		}
-		*/
 	}else if ((state0 & NEW_TASK) && (translation_discret_length == 0)){
 		state0 &= ~NEW_TASK;
 		i = 0;
-		j = 0;
-		/*Для охлаждения*/
-		//PORTC = 0b00000000;
-		//PORTB &= ~CLEAR_E;
-		//sendStaicMessage(SUCCESS_DONE);
+		counter = C0;
+		OCR1A = C0;
 		sendStaicMessage(PSTR("OK\n"));
 	}
 }
@@ -150,10 +117,7 @@ void moveOn(float F){ /*Здесь ошибка*/
 	*/
 
 	struct vector translation;
-	//if((location.x>1.9)&&(location.x<2.1)) {PORTC |= (1<<PC0);}
-	//if((placement.x>-0.1)&&(placement.x<0.1)) {PORTC |= (1<<PC3);}
-	/*if((F>-0.1)&&(F<0.1)) {PORTC |= (1<<PC3);}*/
-	//if(location.x == placement.x) {PORTC |= (1<<PC0);}
+
 	translation.x = placement.x - location.x;
 	translation.y = placement.y - location.y;
 	translation.z = placement.z - location.z;
@@ -182,22 +146,12 @@ void moveOn(float F){ /*Здесь ошибка*/
 		translation_discret.e*translation_discret.e
 	);
 
-	/*translation_discret_length = sqrt(
-		translation.x*translation.x*STEPS_PER_X*STEPS_PER_X +
-		translation.y*translation.y*STEPS_PER_Y*STEPS_PER_Y + 
-		translation.z*translation.z*STEPS_PER_Z*STEPS_PER_Z + 
-		translation.e*translation.e*STEPS_PER_E*STEPS_PER_E
-	);*/
-
-
 	/*
 	Максимально достижимая скорость соответствует kappa = 0.5, следовательно F=6000 
 	Смысл F - это скорость движения, выраженная в мм/мин	
 	*/
 	if (F>6000){F=6000;}
 	
-	//if (F<900){F=900;} //на случай багов в приёме	
-	//F=6000;
 	/*
 		Calculate speed if F changed
 	*/
@@ -220,16 +174,23 @@ void moveOn(float F){ /*Здесь ошибка*/
 			F = MAX_ALLOWED_SPEED_E*translation_length/abs(translation.e);
 		}
 		
+		kappa = (TIMER1_FREQURENCY*60)/(STEPS_PER_X*((long) F));
+
 		/*
 			Calculate new kappa
 		*/
-		/*kappa = translation_length*CPU_FREQURENCY*60/(F*TIMER1_DIVIDER*translation_discret_length);*/
+		/*kappa = translation_length*CPU_FREQURENCY*60/(F*TIMER1_DIVIDER*translation_discret_length);
+		
 		if (translation_discret_length == 0){
 			kappa = (OVERFLOWS_PER_SECOND_TIMER1*60)/(STEPS_PER_X*((long) F));
 		}else{
-			kappa = (OVERFLOWS_PER_SECOND_TIMER1*60)/(STEPS_PER_X*((long) F)); /*По всем осям на один милиметр смещения приходится 5 шагов*/
+			kappa = (OVERFLOWS_PER_SECOND_TIMER1*60)/(STEPS_PER_X*((long) F)); 
 		}
-		
+		*/
+		counter = C0;
+		OCR1A = C0;
+
+
 		/*if (F==10000) {PORTC ^= (1 << PC3);}*/
 		/*if (translation_discret.e==100*STEPS_PER_E) {PORTC ^= (1 << PC3);}*/
 	}

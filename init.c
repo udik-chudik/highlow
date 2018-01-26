@@ -66,14 +66,14 @@ void initDevice(void){
 			WGM11 -> 1
 			WGM12 -> 1
 			WGM13 -> 1
-		Clock select: internal, OSC/1
-			CS10 -> 1
-			CS11 -> 0
+		Clock select: internal, OSC/8
+			CS10 -> 0
+			CS11 -> 1
 			CS12 -> 0
 
 	*/
 	TCCR1A = (1<<WGM11)|(1<<WGM10);
-	TCCR1B = (1<<WGM12)|(1<<WGM13)|(1<<CS10);
+	TCCR1B = (1<<WGM12)|(1<<WGM13)|(1<<CS11);
 
 	/*
 		Compare value:
