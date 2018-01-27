@@ -26,6 +26,8 @@ static long kappa; // = (TIMER1_FREQURENCY*60)/(STEPS_PER_X*INITIAL_F);
 
 ISR(TIMER1_OVF_vect){
 	static int i = 0;
+	static int steps_with_acc = 0;
+
 	if ((state0 & NEW_TASK) && (translation_discret_length != 0)){
 
 		PWM_PORT |= (1<<ENABLE_X);
@@ -89,18 +91,43 @@ ISR(TIMER1_OVF_vect){
 		}
 		if (i < translation_discret_length){
 			i++;
-			counter = counter - 2*counter/(4*i + 1);
-			if (counter >= kappa){
-				OCR1A = counter;
+
+			if (translation_discret_length - i > steps_with_acc){
+				if (OCR1A != kappa){
+					steps_with_acc++;
+					counter = counter - 2*counter/(4*i + 1);
+					if (counter >= kappa){
+						OCR1A = counter;
+					}else{
+						OCR1A = kappa;
+					}
+				}
 			}else{
-				OCR1A = kappa;
+				//Start deceleration
+				OCR1A = OCR1A - 2*OCR1A/(4*(translation_discret_length - i - 2*steps_with_acc) + 1);
 			}
+/*
+
+			if (i >= translation_discret_length/2){
+				if (OCR1A > kappa){
+					counter = counter - 2*counter/(4*(i - translation_discret_length) + 1);
+				}
+			}else{
+				counter = counter - 2*counter/(4*i + 1);
+				if (counter >= kappa){
+					OCR1A = counter;
+				}else{
+					OCR1A = kappa;
+				}
+			}
+*/
 			//OCR1A = OCR1A - 2*OCR1A/(4*i + 1);
 		}else{
 			/*
 				When task has been complete
 			*/
 			translation_discret_length = 0;
+			steps_with_acc = 0;
 		}
 	}else if ((state0 & NEW_TASK) && (translation_discret_length == 0)){
 		state0 &= ~NEW_TASK;
