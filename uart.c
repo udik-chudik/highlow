@@ -51,7 +51,7 @@ ISR(USART_RXC_vect){
 	*/
 	static uint16_t k = 0;
 	static uint8_t buffer[BUFFER_LENGTH];
-	static uint8_t bufferSwap[BUFFER_LENGTH];
+	//static uint8_t bufferSwap[BUFFER_LENGTH];
 	static uint8_t mode = 0;
 
 	/*
@@ -67,7 +67,7 @@ ISR(USART_RXC_vect){
 			Fill the buffer
 		*/
 		if (charter == ';'){
-			mode |= 0;
+			mode |= WAS_COMMENT;
 		}
 		if (k < BUFFER_LENGTH){
 			if (!(mode & WAS_COMMENT)){
@@ -90,18 +90,25 @@ ISR(USART_RXC_vect){
 			/*
 				Clear the buffer before analyzing
 			*/
+			/*
 			for (k = 0; k < BUFFER_LENGTH; k++){
 				bufferSwap[k]=buffer[k];
 				buffer[k] = 0;
 			}
-
+			*/
 			/*
 				The command have been arrived.
 				Lets analyze it!
 			*/
-			if ( ((state0 & CRC_CHECK_ENABLED) && checkCRC(bufferSwap)) || !(state0 & CRC_CHECK_ENABLED) ){
+			if ( ((state0 & CRC_CHECK_ENABLED) && checkCRC(buffer)) || !(state0 & CRC_CHECK_ENABLED) ){
 				
-				AnalyzeCommand(bufferSwap);
+				AnalyzeCommand(buffer);
+				/*
+					Clear the buffer after analyzing
+				*/
+				for (k = 0; k < BUFFER_LENGTH; k++){
+					buffer[k] = 0;
+				}
 			}else{
 				sendStaicMessage(ERROR_CHECKSUM_FAILED);
 			}

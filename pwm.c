@@ -23,28 +23,19 @@ unsigned char TemperatureWindow_bed = 1;
 /*
 	8-bit Timer/Counter0 for PWM stepper control
 */
-ISR(TIMER0_COMP_vect/*, ISR_NAKED*/){
+ISR(TIMER0_COMP_vect, ISR_NAKED){
 	/*
 		When executed -> set PWM_PIN to 0
 	*/
 
-	if (state0 & NEW_TASK){
-		PWM_PORT |= (1<<ENABLE_X);
-		PWM_PORT |= (1<<ENABLE_Y);
-		PWM_PORT |= (1<<ENABLE_Z);
-		PWM_PORT |= (1<<ENABLE_E);
-
-	}else{
+	if (!(state0 & NEW_TASK)){
 		PWM_PORT &= ~(1<<ENABLE_X);
 		PWM_PORT &= ~(1<<ENABLE_Y);
 		PWM_PORT &= ~(1<<ENABLE_Z);
 		//PWM_PORT &= ~(1<<ENABLE_E);
-		/*Для охлаждения*/
-		PORTC = 0b00000000;
-		PORTB &= ~CLEAR_E;
 	}
 
-	//reti();
+	reti();
 }
 ISR(TIMER0_OVF_vect, ISR_NAKED){
 	/*

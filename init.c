@@ -81,7 +81,7 @@ void initDevice(void){
 			65535 - slow
 	*/
 
-	OCR1A = 30000;
+	OCR1A = C0;
 	/*
 		Output Compare A Overfolow Interrupt Enable
 	*/
@@ -100,7 +100,7 @@ void initDevice(void){
 	UCSRB = (1<<RXEN)|(1<<TXEN)|(1<<RXCIE);
 	UCSRC = (1<<URSEL)|(3<<UCSZ0);
 	UBRRH = 0;
-	UBRRL = 207; //-> baud rate = 2400. Used to be 51 -> baud rate = 9600 
+	UBRRL = 25; //-> baud rate = 19200. Used to be 51 -> baud rate = 9600 
 	/*
 		Initial speed for drives
 	*/

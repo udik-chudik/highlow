@@ -13,7 +13,6 @@
 const char DRIVE_PHASES_X[] = {0b10000000,0b11000000,0b01000000,0b01100000,0b00100000,0b00110000,0b00010000,0b10010000};
 const char DRIVE_PHASES_Y[] = {0b00001000,0b00001100,0b00000100,0b00000110,0b00000010,0b00000011,0b00000001,0b00001001};
 const char DRIVE_PHASES_Z[] = {0b10000000,0b11000000,0b01000000,0b01100000,0b00100000,0b00110000,0b00010000,0b10010000};
-//const char DRIVE_PHASES_E[] = {0b00001000,0b00001100,0b00000100,0b00000110,0b00000010,0b00000011,0b00000001,0b00001001};
 const char DRIVE_PHASES_E[] = {0b00001001,0b00000001,0b00000011,0b00000010,0b00000110,0b00000100,0b00001100,0b00001000};
 
 
@@ -21,7 +20,7 @@ static struct discret_vector translation_discret = {0,0,0,0};
 static long translation_discret_length = 0;
 static struct discret_vector progress;
 static long counter;
-static long kappa; // = (TIMER1_FREQURENCY*60)/(STEPS_PER_X*INITIAL_F);
+static long kappa;
 
 
 ISR(TIMER1_OVF_vect){
@@ -29,13 +28,6 @@ ISR(TIMER1_OVF_vect){
 	static int steps_with_acc = 0;
 
 	if ((state0 & NEW_TASK) && (translation_discret_length != 0)){
-
-		PWM_PORT |= (1<<ENABLE_X);
-		PWM_PORT |= (1<<ENABLE_Y);
-		PWM_PORT |= (1<<ENABLE_Z);
-		PWM_PORT |= (1<<ENABLE_E);
-		
-
 
 		if (translation_discret.x > 0){
 			if (progress.x < i*translation_discret.x/translation_discret_length){
@@ -138,7 +130,7 @@ ISR(TIMER1_OVF_vect){
 	}
 }
 
-void moveOn(float F){ /*Здесь ошибка*/
+void moveOn(float F){
 	/*
 		Calculate translation vector
 	*/
@@ -231,6 +223,11 @@ void moveOn(float F){ /*Здесь ошибка*/
 	/*
 		Let's move!
 	*/
+	PWM_PORT |= (1<<ENABLE_X);
+	PWM_PORT |= (1<<ENABLE_Y);
+	PWM_PORT |= (1<<ENABLE_Z);
+	PWM_PORT |= (1<<ENABLE_E);
+
 	state0 |= NEW_TASK;
 }
 
@@ -238,7 +235,6 @@ void doStep(signed char motor){
 
 	static uint8_t phases[] = {0, 0, 0, 0};
 	int next_phase = 0;
-	//PORTC |= (1 << PC2);
 	if (motor > 0){
 		next_phase = phases[motor - 1];
 		if (next_phase == PHASE_LENGTH - 1){
@@ -256,7 +252,6 @@ void doStep(signed char motor){
 		}
 		phases[-1 - motor] = next_phase;
 	}
-	/*PORTC |= (1 << PC1);*/
 	switch(motor){
 		case INC_X: 
 			PORT_X &= CLEAR_X;
