@@ -169,7 +169,7 @@ void moveOn(float F){
 	Максимально достижимая скорость соответствует kappa = 0.5, следовательно F=6000 
 	Смысл F - это скорость движения, выраженная в мм/мин	
 	*/
-	if (F>6000){F=6000;}
+	//if (F>6000){F=6000;}
 	
 	/*
 		Calculate speed if F changed
@@ -223,9 +223,15 @@ void moveOn(float F){
 	/*
 		Let's move!
 	*/
-	PWM_PORT |= (1<<ENABLE_X);
-	PWM_PORT |= (1<<ENABLE_Y);
-	PWM_PORT |= (1<<ENABLE_Z);
+	if (translation_discret.x != 0){
+		PWM_PORT |= (1<<ENABLE_X);
+	}
+	if (translation_discret.y != 0){
+		PWM_PORT |= (1<<ENABLE_Y);
+	}
+	if (translation_discret.z != 0){
+		PWM_PORT |= (1<<ENABLE_Z);
+	}
 	PWM_PORT |= (1<<ENABLE_E);
 
 	state0 |= NEW_TASK;
