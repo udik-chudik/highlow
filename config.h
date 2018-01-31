@@ -4,7 +4,7 @@
 #define OVERFLOWS_PER_SECOND_TIMER1 256 /*Сколько раз переполняется таймер 1 за одну секунду*/
 #define TIMER1_FREQURENCY 1000000
 #define ACCELERATION 10
-#define C0 64000
+#define C0 20000
 /*соответственно максимально возможная скорость -- это 3 м/мин достигается при F=6000*/
 #define CPU_FREQURENCY 8000000
 #define PWM_PORT PORTA
@@ -48,10 +48,10 @@
 #define STEPS_PER_Y 10 //5
 #define STEPS_PER_Z 304
 #define STEPS_PER_E 20 //10
-#define MAX_ALLOWED_SPEED_X 5000
-#define MAX_ALLOWED_SPEED_Y 5000
-#define MAX_ALLOWED_SPEED_Z 1000
-#define MAX_ALLOWED_SPEED_E 3000
+#define MAX_ALLOWED_SPEED_X 15000
+#define MAX_ALLOWED_SPEED_Y 15000
+#define MAX_ALLOWED_SPEED_Z 3000
+#define MAX_ALLOWED_SPEED_E 5000
 #define INITIAL_F 1000
 #define INC_X  1
 #define DEC_X -1
