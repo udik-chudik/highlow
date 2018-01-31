@@ -33,6 +33,9 @@ ISR(TIMER0_COMP_vect, ISR_NAKED){
 		PWM_PORT &= ~(1<<ENABLE_Y);
 		PWM_PORT &= ~(1<<ENABLE_Z);
 		//PWM_PORT &= ~(1<<ENABLE_E);
+		/*Для охлаждения*/
+		PORTC = 0b00000000;
+		PORTB &= ~CLEAR_E;
 	}
 
 	reti();
